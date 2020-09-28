@@ -27,18 +27,28 @@ Chain::~Chain()
  */
 void Chain::insertBack(const Block &ndata)
 {
-    Node* newNode = new Node(ndata);
-    newNode->next = head_;
-    Node* curr = head_->next;
+    if(empty()) {
+        head_ = new Node();
+        head_->next = new Node(ndata);
+        head->next->next = head_;
+        height_ += ndata.height();
+        width_ += ndata.width();  
+        length_ = 1;
+    } else {
+        Node* newNode = new Node(ndata);
+        newNode->next = head_;
+        Node* curr = head_->next;
 
-    while(curr->next != head)
-    {
-        curr = curr->next;
+        while(curr->next != head_)
+        {
+            curr = curr->next;
+        }
+        curr->next = newNode;
+        length_ = length_ + 1;
+        height_ = ndata.height() + height_;
+        width_ = ndata.width() + width_;  
     }
-    curr->next = newNode;
-    length_ = length_ + 1;
-    height_ = ndata.height() + height_;
-    width_ = ndata.width() + width_;   
+     
 }
 
 
