@@ -108,6 +108,12 @@ private:
    */
    void copy(const Chain &other);
 
+   /**
+   * Helper function to delete nodes from linkedlist
+   * @param Cursor The node to be deleted.
+   */ 
+   void deleteNode(Node* cursor);
+
    /* =================== end of private PA1 functions ============== */
 };
 

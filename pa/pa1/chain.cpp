@@ -11,7 +11,12 @@
  */
 Chain::~Chain()
 {
-/* your code here */
+    clear();
+    delete head_;
+    head_ = NULL;
+    length_ = 0;
+    height_ = 0;
+    width_ = 0;
 }
 
 /**
@@ -22,9 +27,30 @@ Chain::~Chain()
  */
 void Chain::insertBack(const Block &ndata)
 {
-/* your code here */
+    Node* newNode = new Node(ndata);
+    newNode->next = head_;
+    Node* curr = head_->next;
+
+    while(curr->next != head)
+    {
+        curr = curr->next;
+    }
+    curr->next = newNode;
+    length_ = length_ + 1;
+    height_ = ndata.height() + height_;
+    width_ = ndata.width() + width_;   
 }
 
+
+void Chain::deleteNode(Node* cursor){
+    if (cursor->next != NULL) {
+        deleteNode(cursor->next);
+    }
+    if (length_ >= 1)
+        length_ -= 1;
+    delete cursor;
+    assert(length_ >= 0);
+}
 
 /**
  * Swaps the two nodes at the indexes "node1" and "node2".
@@ -34,7 +60,12 @@ void Chain::insertBack(const Block &ndata)
  */
 void Chain::swap(int i, int j)
 {
-/* your code here */
+    Node* first = Chain::walk(head_, i);
+    Node* second = Chain::walk(head_, j);
+    
+    Node* placeholder = first->next;
+    first->next = second->next;
+    second->next = placeholder;
 }
 
 /**
@@ -42,7 +73,16 @@ void Chain::swap(int i, int j)
  */
 void Chain::reverse()
 {
-/* your code here */
+    Node* current = head_->next; 
+    Node *prev = NULL, *next = NULL; 
+  
+    while (current != head_) 
+    { 
+        next = current->next; 
+        current->next = prev; 
+        prev = current; 
+        current = next; 
+    } 
 }
 
 /*
@@ -58,7 +98,10 @@ void Chain::reverse()
 */
 void Chain::rotate(int k)
 {
-/* your code here */
+    for(int i = 1; i < length_-k; i++)
+    {
+        swap(i, i+k);
+    }
 }
 
 /**
@@ -67,7 +110,14 @@ void Chain::rotate(int k)
  */
 void Chain::clear()
 {
-/* your code here */
+    if (head_->next == head_){
+        return;
+    }
+    else{
+        deleteNode(head_->next);
+        head_->next = head_;
+        length_ = 0;
+    }
 }
 
 /* makes the current object into a copy of the parameter:
@@ -78,5 +128,18 @@ void Chain::clear()
  */
 void Chain::copy(Chain const &other)
 {
-/* your code here */
+    height_ = other.height_;
+    width_ = other.width_;
+    length_ = other.length_;
+
+    Node* otherNode = other.head_;
+    Node *current = head_;
+
+    while (otherNode != NULL) 
+    {
+        current->next = new Node(otherNode->data);
+        current = current->next;
+        otherNode = otherNode->next;
+    }
+    current->next = head_;
 }
