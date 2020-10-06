@@ -12,11 +12,6 @@
 Chain::~Chain()
 {
   clear();
-  delete head_;
-  head_ = NULL;
-  length_ = 0;
-  height_ = 0;
-  width_ = 0;
 }
 
 /**
@@ -27,20 +22,10 @@ Chain::~Chain()
  */
 void Chain::insertBack(const Block &ndata)
 {
-        Node* newNode = new Node(ndata);
-        Node* curr = head_;
-		curr->next = head_->next;
-
-        while(curr->next != head_)
-            curr = curr->next;
-        
-        curr->next = newNode;
-		newNode->next = head_;
-		
-        length_ = length_ + 1;
-        height_ = ndata.height();
-        width_ = ndata.width();
-    
+		Node* tail = walk(head_, length_);
+		tail->next = new Node(ndata);
+		tail->next->next = head_;
+        length_++;
 }
 
 
@@ -120,21 +105,23 @@ void Chain::rotate(int k)
  */
 void Chain::clear()
 {
-  /*if (head_->next == head_){
-    return;
-  }
-  else{
-    delete(head_->next);
-    head_->next = head_;
-    length_ = 0;
-	
-  }*/
+	/*
   	head_ = new Node();
   
-  for(int x = 1; x <= length_; x++){
-		Node* temp = walk(head_, x);
-		delete(temp);
-  }
+	for(int x = 1; x <= length_; x++){
+			Node* temp = walk(head_, x);
+			delete(temp);
+	} */
+
+  	Node* curr = head_->next;
+	Node* placeholder;
+    while (curr != head_) {
+         placeholder = curr->next;
+         delete curr;
+         curr = placeholder;
+     }
+     delete head_;
+     length_ = 0;
   
   //delete(head_);
   
@@ -149,25 +136,19 @@ void Chain::clear()
 void Chain::copy(Chain const &other)
 {
 	
-	head_ = new Node();
+	width_ = other.width_;
+    height_ = other.height_;
+	length_ = 0;
+
+    head_ = new Node();
+    
 	head_->next = head_;
-	
-	height_ = other.height_;
-    width_ = other.width_;
-	
-	Node* current = head_;
-	Node* otherNode = other.head_->next;
-	
-	
-	for(int x = 1; x <= other.length_; x++){
-		Node* newNode = new Node(otherNode->data);
-		current->next = newNode;
-		current = current->next;
-		otherNode = otherNode->next;
-		
-	}
-	
-	current->next = head_;
-	length_ = other.length_;
+
+    Node* other_curr = other.head_->next;
+
+     for (int i = 0; i < other.size(); i++) {
+         insertBack(other_curr->data);
+         other_curr = other_curr->next;
+     }
 
 }
