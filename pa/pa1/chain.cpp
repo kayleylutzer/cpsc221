@@ -11,12 +11,12 @@
  */
 Chain::~Chain()
 {
-    clear();
-    delete head_;
-    head_ = NULL;
-    length_ = 0;
-    height_ = 0;
-    width_ = 0;
+  clear();
+  delete head_;
+  head_ = NULL;
+  length_ = 0;
+  height_ = 0;
+  width_ = 0;
 }
 
 /**
@@ -27,40 +27,22 @@ Chain::~Chain()
  */
 void Chain::insertBack(const Block &ndata)
 {
-    if(empty()) {
-        head_ = new Node();
-        head_->next = new Node(ndata);
-        head->next->next = head_;
-        height_ += ndata.height();
-        width_ += ndata.width();  
-        length_ = 1;
-    } else {
         Node* newNode = new Node(ndata);
-        newNode->next = head_;
-        Node* curr = head_->next;
+        Node* curr = head_;
+		curr->next = head_->next;
 
         while(curr->next != head_)
-        {
             curr = curr->next;
-        }
+        
         curr->next = newNode;
+		newNode->next = head_;
+		
         length_ = length_ + 1;
-        height_ = ndata.height() + height_;
-        width_ = ndata.width() + width_;  
-    }
-     
+        height_ = ndata.height();
+        width_ = ndata.width();
+    
 }
 
-
-void Chain::deleteNode(Node* cursor){
-    if (cursor->next != NULL) {
-        deleteNode(cursor->next);
-    }
-    if (length_ >= 1)
-        length_ -= 1;
-    delete cursor;
-    assert(length_ >= 0);
-}
 
 /**
  * Swaps the two nodes at the indexes "node1" and "node2".
@@ -70,29 +52,42 @@ void Chain::deleteNode(Node* cursor){
  */
 void Chain::swap(int i, int j)
 {
-    Node* first = Chain::walk(head_, i);
-    Node* second = Chain::walk(head_, j);
-    
-    Node* placeholder = first->next;
-    first->next = second->next;
-    second->next = placeholder;
+	
+	
+  Node* i_node_prev = walk(head_, i-1);
+  Node* j_node_prev = walk(head_, j-1);
+
+  Node* i_node = i_node_prev->next;
+  Node* j_node = j_node_prev->next;
+  
+  Node* i_node_next = i_node->next;
+  Node* j_node_next = j_node->next;
+  
+  if(i == j - 1){
+	  i_node->next = j_node_next;
+	  j_node->next = i_node;
+	  i_node_prev->next = j_node;
+  }else if (j == i - 1){
+	  j_node->next = i_node_next;
+	  i_node->next = j_node;
+	  j_node_prev->next = i_node;
+  }else{
+	i_node->next = j_node_next;
+	j_node_prev->next = i_node; //i_node now has a before and after
+	
+	j_node->next = i_node_next;
+	i_node_prev->next = j_node; //j_node now has a before and after
+  }
+
 }
 
 /**
  * Reverses the chain
  */
 void Chain::reverse()
-{
-    Node* current = head_->next; 
-    Node *prev = NULL, *next = NULL; 
-  
-    while (current != head_) 
-    { 
-        next = current->next; 
-        current->next = prev; 
-        prev = current; 
-        current = next; 
-    } 
+{ 	
+	for(int x = 1; x <= ((length_ % 2 == 0) ? length_ / 2 : (length_ - 1) / 2); x++)
+		swap(x, length_ - x + 1);
 }
 
 /*
@@ -106,12 +101,17 @@ void Chain::reverse()
 *   k = 3: b c a d e
 *   k = 4: b c d a e
 */
+
 void Chain::rotate(int k)
 {
-    for(int i = 1; i < length_-k; i++)
-    {
-        swap(i, i+k);
-    }
+	if(k > length_ || k == 1)
+		return;
+	
+	for(int i = 1; i < length_; i += k){
+		for(int j = 0; j < k - 1; j++){
+			swap(j+i, j+i+1);	
+			}
+	}
 }
 
 /**
@@ -120,14 +120,24 @@ void Chain::rotate(int k)
  */
 void Chain::clear()
 {
-    if (head_->next == head_){
-        return;
-    }
-    else{
-        deleteNode(head_->next);
-        head_->next = head_;
-        length_ = 0;
-    }
+  /*if (head_->next == head_){
+    return;
+  }
+  else{
+    delete(head_->next);
+    head_->next = head_;
+    length_ = 0;
+	
+  }*/
+  	head_ = new Node();
+  
+  for(int x = 1; x <= length_; x++){
+		Node* temp = walk(head_, x);
+		delete(temp);
+  }
+  
+  //delete(head_);
+  
 }
 
 /* makes the current object into a copy of the parameter:
@@ -138,18 +148,26 @@ void Chain::clear()
  */
 void Chain::copy(Chain const &other)
 {
-    height_ = other.height_;
+	
+	head_ = new Node();
+	head_->next = head_;
+	
+	height_ = other.height_;
     width_ = other.width_;
-    length_ = other.length_;
+	
+	Node* current = head_;
+	Node* otherNode = other.head_->next;
+	
+	
+	for(int x = 1; x <= other.length_; x++){
+		Node* newNode = new Node(otherNode->data);
+		current->next = newNode;
+		current = current->next;
+		otherNode = otherNode->next;
+		
+	}
+	
+	current->next = head_;
+	length_ = other.length_;
 
-    Node* otherNode = other.head_;
-    Node *current = head_;
-
-    while (otherNode != NULL) 
-    {
-        current->next = new Node(otherNode->data);
-        current = current->next;
-        otherNode = otherNode->next;
-    }
-    current->next = head_;
 }
