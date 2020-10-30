@@ -5,6 +5,11 @@
  * Modify and turn in this file for the PA!
  *
  */
+ 
+ /*
+ * stack_1 will be the "input" stack
+ * stack_2 will be the "output" stack
+ */
 
 /**
  * Adds the parameter object to the back of the Queue.
@@ -16,6 +21,11 @@ template <class T> void Queue<T>::enq(T const &newItem)
   /**
    * @todo Your code here!
    */
+   
+   stack_1.push(newItem);
+   num_items++;
+  
+   
 }
 
 /**
@@ -29,7 +39,19 @@ template <class T> T Queue<T>::deq()
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return T();
+
+    if(stack_2.isEmpty()){
+        while(!stack_1.isEmpty())
+            stack_2.push(stack_1.pop());
+	}
+
+        T temp = null;
+        if(!stack_2.isEmpty()) {
+            temp = stack_2.pop();
+            size--;
+        }
+
+        return temp;
 }
 
 /**
@@ -43,7 +65,7 @@ template <class T> T Queue<T>::peek()
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return T();
+  return stack_2.peek();
 }
 
 /**
@@ -56,5 +78,5 @@ template <class T> bool Queue<T>::empty() const
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return true;
+  return stack_1.size(); == 0;
 }

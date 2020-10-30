@@ -17,6 +17,25 @@ template <class T> Stack<T>::Stack()
   /**
    * @todo Your code here!
    */
+   
+   max_items = DEFAULTCAPACITY;
+   items = new int[max_items];
+   num_items = 0;
+   int top = -1;
+}
+
+//Non default constructor
+
+template <class T> Stack<T>::newStack(int newCapacity)
+{
+  /**
+   * @todo Your code here!
+   */
+   
+   max_items = newCapacity;
+   items = new int[max_items];
+   num_items = 0;
+    
 }
 
 /**
@@ -28,6 +47,8 @@ template <class T> Stack<T>::~Stack()
   /**
    * @todo Your code here!
    */
+   
+   delete[] items;
 }
 
 /**
@@ -42,6 +63,12 @@ template <class T> void Stack<T>::push(const T &newItem)
   /**
    * @todo Your code here!
    */
+   
+   if(isFull())
+	   resize(EXPANSIONFACTOR);
+   
+   items[++top] = newItem;
+   
 };
 
 /**
@@ -60,7 +87,14 @@ template <class T> T Stack<T>::pop()
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return T();
+  
+
+  if((size() - 1) < (1 / SHRINKWHEN)){
+	resize(1/EXPANSIONFACTOR);
+  }
+   
+  items = items[top--];
+  
 };
 
 /**
@@ -76,7 +110,7 @@ template <class T> T Stack<T>::peek()
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return T();
+  return items[top];
 };
 
 /**
@@ -89,7 +123,7 @@ template <class T> bool Stack<T>::empty() const
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return true;
+  return size() = 0;
 };
 
 /**
@@ -105,7 +139,7 @@ template <class T> size_t Stack<T>::capacity() const
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return 0;
+  return max_items;
 };
 
 /**
@@ -118,7 +152,7 @@ template <class T> size_t Stack<T>::size() const
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return 0;
+  return num_items;
 };
 
 /**
@@ -132,5 +166,10 @@ template <class T> void Stack<T>::resize(size_t n)
   /**
    * @todo Your code here!
    */
+   
+   max_items *= n;
+   newStack(max_items);
+   newStack = *items;
+   delete[] *items;
 
 };
