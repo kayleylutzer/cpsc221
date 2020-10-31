@@ -31,9 +31,9 @@ void Queue<T>::enq(T const &newItem)
 template <class T>
 T Queue<T>::deq()
 {
-  if (stack_2.isEmpty())
+  if (stack_2.empty())
   {
-    while (!stack_1.isEmpty())
+    while (!stack_1.empty())
     {
       stack_2.push(stack_1.pop());
     }
@@ -50,9 +50,9 @@ T Queue<T>::deq()
 template <class T>
 T Queue<T>::peek()
 {
-  if (stack_2.isEmpty())
+  if (stack_2.empty())
   {
-    while (!stack_1.isEmpty())
+    while (!stack_1.empty())
     {
       stack_2.push(stack_1.pop());
     }
@@ -68,5 +68,5 @@ T Queue<T>::peek()
 template <class T>
 bool Queue<T>::empty() const
 {
-  return stack_1.isEmpty() && stack_2.isEmpty();
+  return stack_1.empty() && stack_2.empty();
 }
