@@ -6,6 +6,7 @@
  *
  */
 #include "rr.h"
+#include <map>
 
 // This shows all the function declarations (and some of the
 // functions) that I used to implement rainbowRipple.
@@ -116,7 +117,7 @@ bool good(PNG &image, vector<vector<int>> &D,
 
   if (unsigned(next.first) < image.width() && unsigned(next.first) >= 0 && unsigned(next.second) < image.height() && unsigned(next.second) >= 0)
   {
-    if (D[next.first][next.second] != -1)
+    if ( D[next.first][next.second] != -1)
     {
       return closeEnough(*image.getPixel(curr.first, curr.second), *image.getPixel(next.first, next.second));
     }
@@ -128,17 +129,19 @@ bool good(PNG &image, vector<vector<int>> &D,
 vector<pair<int, int>> neighbors(pair<int, int> curr)
 {
   vector<pair<int, int>> n;
-  vector<vector<int>> dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-  for (auto const &dir : dirs)
+  vector<pair<int, int>> dirs = {make_pair(0, 1), make_pair(0, -1), make_pair(1, 0), make_pair(-1, 0)};
+  for (size_t i = 0; i < dirs.size(); i++)
   {
-    pair<int, int> neighbor(curr.first + dir[0], curr.second + dir[1]);
-    n.push_back(neighbor);
+    n.push_back(make_pair(curr.first + dirs[i].first, curr.second + dirs[i].second));
   }
   return n;
 }
 
-int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps)
+int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps, map<int, int> &sumMemo)
 {
+  if(sumMemo.find(sum) != sumMemo.end()){
+    return sumMemo.find(sum)->second;
+  }
   int curr = 0;
   size_t gapIndex = 0;
   bool flag = false;
@@ -158,6 +161,7 @@ int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps)
       curr = curr + gaps[gapIndex].first;
       if (curr == sum)
       {
+        sumMemo[curr] = gapIndex;
         return gapIndex;
       }
       gapIndex++;
@@ -203,39 +207,44 @@ void rainbowRipple(PNG &image, pair<int, int> start, string sgc)
   // colored blue using the sequence (9,red),(4,blue),(3,green) since
   // 33 = (9+1+4+1+3+1)+9+1+4.
 
+  if (unsigned(start.first) < 0 || unsigned(start.first) >= image.width() || unsigned(start.second) < 0 || unsigned(start.second) >= image.height())
+    return;
   vector<pair<int, RGBAPixel>> gaps = parseGaps(sgc);
 
   Queue<pair<pair<int, int>, int>> q;
-  vector<vector<int>> D(image.height(), vector<int>(image.width(), 0));
-
+  vector<vector<int>> D (image.width(), vector<int>(image.height(), 0));
+  map<int,int> sumMemo;
   // Queue with each node = ((x,y), level)
   q.enq(make_pair(start, 1));
 
   while (!q.empty())
   {
-
     pair<pair<int, int>, int> curr = q.deq();
-    // mark x,y as visited in D
-    D[curr.first.first][curr.first.second] = -1;
-
-    // get all neighbors and enqueue them
-    for (auto &neighbor : neighbors(curr.first))
+    if(D[curr.first.first][curr.first.second] != -1) 
     {
-      if (good(image, D, curr.first, neighbor))
+      //cout << curr.first.first << " " << curr.first.second << " " << curr.second << " \n";
+      // mark x,y as visited in D
+      D[curr.first.first][curr.first.second] = -1;
+
+      // get all neighbors and enqueue them
+      vector<pair<int, int>> closeNodes = neighbors(curr.first);
+      for (size_t i = 0; i<closeNodes.size(); i++)
       {
-        pair<pair<int, int>, int> child(neighbor, curr.second++);
-        q.enq(child);
+        if (good(image, D, curr.first, closeNodes[i]))
+        {
+          pair<pair<int, int>, int> child(closeNodes[i], curr.second+1);
+          q.enq(child);
+        }
       }
-    }
-
-    int colorIdx = computeColor(curr.second, gaps);
-    if (colorIdx != -1)
-    {
-      RGBAPixel *pixel = image.getPixel(curr.first.first, curr.first.second);
-      pixel->r = gaps[colorIdx].second.r;
-      pixel->g = gaps[colorIdx].second.g;
-      pixel->b = gaps[colorIdx].second.b;
-      pixel->a = gaps[colorIdx].second.a;
+      int colorIdx = computeColor(curr.second, gaps, sumMemo);
+      if (colorIdx != -1)
+      {
+        RGBAPixel *pixel = image.getPixel(curr.first.first, curr.first.second);
+        pixel->r = gaps[colorIdx].second.r;
+        pixel->g = gaps[colorIdx].second.g;
+        pixel->b = gaps[colorIdx].second.b;
+        pixel->a = gaps[colorIdx].second.a;
+      }
     }
   }
 }
