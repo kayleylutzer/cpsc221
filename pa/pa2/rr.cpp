@@ -136,6 +136,7 @@ vector<pair<int, int>> neighbors(pair<int, int> curr)
     n.push_back(neighbor);
     return n;
   }
+}
 
   void rainbowRipple(PNG & image, pair<int, int> start, string sgc)
   {
@@ -190,6 +191,8 @@ vector<pair<int, int>> neighbors(pair<int, int> curr)
           q.enq(child);
           // color neighbor
           // TODO
+          int colorIdx = computeColor(curr[1], gaps);
+
         }
       }
     }
