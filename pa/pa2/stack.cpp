@@ -12,43 +12,22 @@
  *
  */
 
-template <class T> Stack<T>::Stack()
+template <class T>
+Stack<T>::Stack()
 {
-  /**
-   * @todo Your code here!
-   */
-   
-   max_items = DEFAULTCAPACITY;
-   items = new int[max_items];
-   num_items = 0;
-   int top = -1;
-}
-
-//Non default constructor
-
-template <class T> Stack<T>::newStack(int newCapacity)
-{
-  /**
-   * @todo Your code here!
-   */
-   
-   max_items = newCapacity;
-   items = new int[max_items];
-   num_items = 0;
-    
+  items = new T[DEFAULTCAPACITY];
+  num_items = 0;
+  max_items = DEFAULTCAPACITY;
 }
 
 /**
  * Destructor. Remember to free any memory allocated.
  *
  */
-template <class T> Stack<T>::~Stack()
+template <class T>
+Stack<T>::~Stack()
 {
-  /**
-   * @todo Your code here!
-   */
-   
-   delete[] items;
+  delete items;
 }
 
 /**
@@ -58,17 +37,19 @@ template <class T> Stack<T>::~Stack()
  *
  * @param value The object to be added to the Stack.
  */
-template <class T> void Stack<T>::push(const T &newItem)
+template <class T>
+void Stack<T>::push(const T &newItem)
 {
-  /**
-   * @todo Your code here!
-   */
-   
-   if(isFull())
-	   resize(EXPANSIONFACTOR);
-   
-   items[++top] = newItem;
-   
+  if (num_items < max_items)
+  {
+    items[num_items++] = newItem;
+  }
+  else
+  {
+    resize(max_items * EXPANSIONFACTOR);
+    max_items *= EXPANSIONFACTOR;
+    items[num_items++] = newItem;
+  }
 };
 
 /**
@@ -82,19 +63,16 @@ template <class T> void Stack<T>::push(const T &newItem)
  *
  * @return The element that was at the top of the Stack.
  */
-template <class T> T Stack<T>::pop()
+template <class T>
+T Stack<T>::pop()
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
-  
-
-  if((size() - 1) < (1 / SHRINKWHEN)){
-	resize(1/EXPANSIONFACTOR);
+  T item = items[--num_items];
+  if (num_items + 1 < max_items / SHRINKWHEN)
+  {
+    resize(max_items / EXPANSIONFACTOR);
+    max_items /= EXPANSIONFACTOR;
   }
-   
-  items = items[top--];
-  
+  return item;
 };
 
 /**
@@ -105,12 +83,13 @@ template <class T> T Stack<T>::pop()
  *
  * @return The element at the top of the Stack.
  */
-template <class T> T Stack<T>::peek()
+template <class T>
+T Stack<T>::peek()
 {
   /**
    * @todo Your code here! You will need to replace the following line.
    */
-  return items[top];
+  return items[num_items - 1];
 };
 
 /**
@@ -118,12 +97,10 @@ template <class T> T Stack<T>::peek()
  *
  * @return Whether or not the stack is empty (bool).
  */
-template <class T> bool Stack<T>::empty() const
+template <class T>
+bool Stack<T>::empty() const
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
-  return size() = 0;
+  return num_items == 0;
 };
 
 /**
@@ -134,11 +111,9 @@ template <class T> bool Stack<T>::empty() const
  *
  * @return Maximum number of items the stack can hold (int)
  */
-template <class T> size_t Stack<T>::capacity() const
+template <class T>
+size_t Stack<T>::capacity() const
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
   return max_items;
 };
 
@@ -147,11 +122,9 @@ template <class T> size_t Stack<T>::capacity() const
  *
  * @return Number of items on the stack (int)
  */
-template <class T> size_t Stack<T>::size() const
+template <class T>
+size_t Stack<T>::size() const
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
   return num_items;
 };
 
@@ -161,15 +134,15 @@ template <class T> size_t Stack<T>::size() const
  *
  * @param n The size of the stack after resizing
  */
-template <class T> void Stack<T>::resize(size_t n)
+template <class T>
+void Stack<T>::resize(size_t n)
 {
-  /**
-   * @todo Your code here!
-   */
-   
-   max_items *= n;
-   newStack(max_items);
-   newStack = *items;
-   delete[] *items;
-
+  T *resized = new T[n];
+  size_t x = n < num_items ? n : num_items;
+  for (T *p = items, *p2 = resized; p < items + x; p++, p2++)
+  {
+    *p2 = *p;
+  }
+  delete items;
+  items = resized;
 };

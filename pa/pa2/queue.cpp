@@ -5,8 +5,8 @@
  * Modify and turn in this file for the PA!
  *
  */
- 
- /*
+
+/*
  * stack_1 will be the "input" stack
  * stack_2 will be the "output" stack
  */
@@ -16,16 +16,10 @@
  *
  * @param newItem object to be added to the Queue.
  */
-template <class T> void Queue<T>::enq(T const &newItem)
+template <class T>
+void Queue<T>::enq(T const &newItem)
 {
-  /**
-   * @todo Your code here!
-   */
-   
-   stack_1.push(newItem);
-   num_items++;
-  
-   
+  stack_1.push(newItem);
 }
 
 /**
@@ -34,24 +28,17 @@ template <class T> void Queue<T>::enq(T const &newItem)
  *
  * @return The object that used to be at the front of the Queue.
  */
-template <class T> T Queue<T>::deq()
+template <class T>
+T Queue<T>::deq()
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
-
-    if(stack_2.isEmpty()){
-        while(!stack_1.isEmpty())
-            stack_2.push(stack_1.pop());
-	}
-
-        T temp = null;
-        if(!stack_2.isEmpty()) {
-            temp = stack_2.pop();
-            size--;
-        }
-
-        return temp;
+  if (stack_2.isEmpty())
+  {
+    while (!stack_1.isEmpty())
+    {
+      stack_2.push(stack_1.pop());
+    }
+  }
+  return stack_2.pop();
 }
 
 /**
@@ -60,11 +47,16 @@ template <class T> T Queue<T>::deq()
  *
  * @return The item at the front of the queue.
  */
-template <class T> T Queue<T>::peek()
+template <class T>
+T Queue<T>::peek()
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
+  if (stack_2.isEmpty())
+  {
+    while (!stack_1.isEmpty())
+    {
+      stack_2.push(stack_1.pop());
+    }
+  }
   return stack_2.peek();
 }
 
@@ -73,10 +65,8 @@ template <class T> T Queue<T>::peek()
  *
  * @return bool which is true if the Queue is empty, false otherwise.
  */
-template <class T> bool Queue<T>::empty() const
+template <class T>
+bool Queue<T>::empty() const
 {
-  /**
-   * @todo Your code here! You will need to replace the following line.
-   */
-  return stack_1.size(); == 0;
+  return stack_1.isEmpty() && stack_2.isEmpty();
 }
