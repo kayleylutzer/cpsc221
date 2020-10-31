@@ -104,16 +104,24 @@ bool good(PNG & image, vector<vector<int>> & D,
 // An entry in distance table D is -1 only if the pixel has not been 
 // visited.
 
-  // @todo Replace the following line with your code.
-  return true;
+  if (next[0] < image.width() && next[0] >= 0 &&  next[1] < image.height() && next[1] >= 0 )
+  {
+    if (D[next[0], next[1]] != -1) 
+    {
+      return closeEnough(image.getPixel(curr[0], curr[1]), image.getPixel(next[0], next[1]));
+    }
+  }
+
+  return false;
 }
 
 vector<pair<int,int>> neighbors(pair<int,int> curr) {
 
   vector<pair<int,int>> n;
-
-  // @todo Add your code here.
-
+  vector<vector<int>> dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+  for(auto dir : dirs) { 
+    pair<int, int> neighbor (curr[0] + dir[0], curr[1] + dir[1]);
+    n.push_back(neighbor);
   return n;
 }
 
