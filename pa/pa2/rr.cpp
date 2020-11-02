@@ -139,6 +139,7 @@ vector<pair<int, int>> neighbors(pair<int, int> curr)
 
 int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps, map<int, int> &sumMemo)
 {
+  //cout << sum << "\n";
   if(sumMemo.find(sum) != sumMemo.end()){
     return sumMemo.find(sum)->second;
   }
@@ -146,15 +147,11 @@ int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps, map<int, int> &sumM
   size_t gapIndex = 0;
   bool flag = false;
 
-  while (curr < sum)
+  while (curr <= sum)
   {
     if (flag)
     {
       curr++;
-      if (curr >= sum)
-      {
-        break;
-      }
     }
     else
     {
@@ -172,6 +169,7 @@ int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps, map<int, int> &sumM
     }
     flag = !flag;
   }
+  sumMemo[sum] = -1;
   return -1;
 }
 
@@ -207,10 +205,8 @@ void rainbowRipple(PNG &image, pair<int, int> start, string sgc)
   // colored blue using the sequence (9,red),(4,blue),(3,green) since
   // 33 = (9+1+4+1+3+1)+9+1+4.
 
-  if (unsigned(start.first) < 0 || unsigned(start.first) >= image.width() || unsigned(start.second) < 0 || unsigned(start.second) >= image.height())
-    return;
   vector<pair<int, RGBAPixel>> gaps = parseGaps(sgc);
-
+  
   Queue<pair<pair<int, int>, int>> q;
   vector<vector<int>> D (image.width(), vector<int>(image.height(), 0));
   map<int,int> sumMemo;
