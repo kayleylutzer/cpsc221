@@ -143,7 +143,7 @@ int computeColor(int sum, vector<pair<int, RGBAPixel>> gaps, map<int, int> &sumM
   if(sumMemo.find(sum) != sumMemo.end()){
     return sumMemo.find(sum)->second;
   }
-  int curr = 0;
+  int curr = 1;
   size_t gapIndex = 0;
   bool flag = false;
 
