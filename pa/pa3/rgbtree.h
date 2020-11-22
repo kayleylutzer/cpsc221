@@ -187,6 +187,11 @@ public:
      */
     int distToSplit(const RGBAPixel& query, const RGBAPixel& curr, int dimension ) const;
 
+    void buildTree(int start, int end, int dimension);
+
+    int distance(RGBAPixel a, RGBAPixel b);
+
+    RGBAPixel recursiveFindNearest(int start, int end, const RGBAPixel & query, int minDist);
 };
 #endif
 

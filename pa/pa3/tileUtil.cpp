@@ -23,9 +23,30 @@
  */
 
 PNG tiler::tile(PNG & target, const rgbtree & ss, map<RGBAPixel,string> & photos){
-
-/* your code here! */
-
+    PNG returnImage = PNG(target.width() * TILESIZE, target.height()*TILESIZE);
+    for(int i = 0; i < target.height(); i++ ) 
+    { 
+        for(int j = 0; j < target.width(); j++) 
+        { 
+            RGBAPixel key = ss.nearestNeighbour(&target.getPixel(i, j));
+            PNG curr; curr.readFromFile(photos.get(key));
+            int startHeight = i*TILESIZE; 
+            int startWidth = j*TILESIZE;
+            for(startHeight < startHeight + TILESIZE; startHeight++) 
+            { 
+                for(startWidth < startWidth + TILESIZE; startWidth++)
+                { 
+                    RGBAPixel* pixelInBiggerImage = returnImage.getPixel(startWidth, startHeight);
+                    RGBAPixel* pixelInSmallerImage = curr.getPixel(startWidth%TILESIZE, startHeight%TILESIZE);
+                    pixelInBiggerImage->r = pixelInSmallerImage->r;
+                    pixelInBiggerImage->g = pixelInSmallerImage->g;
+                    pixelInBiggerImage->b = pixelInSmallerImage->b;
+                    pixelInBiggerImage->a = pixelInSmallerImage->a;
+                }
+            }
+        }
+    }
+    return returnImage;
 }
 
 /* buildMap: function for building the map of <key, value> pairs, where the key is an
@@ -45,11 +66,20 @@ map<RGBAPixel, string> tiler::buildMap(string path) {
     map < RGBAPixel, string> thumbs;
     for (const auto & entry : fs::directory_iterator(path)) {
         PNG curr; curr.readFromFile(entry.path());
-
-
-    /* your code here */
-
-
+        int r,g,b = 0,0,0;
+        int dims = curr.height() * curr.width();
+        for(int y = 0; y < curr.height(); y++)
+        {
+            for(int x = 0; x < curr.width(); x++)
+            { 
+                RGBAPixel* pixel = curr.getPixel(x,y);
+                r += pixel->r;
+                g += pixel->g;
+                b += pixel->b;
+            }
+        }
+        RGBAPixel avgPixel = RGBAPixel(r/dims, g/dims, b/dims);
+        thumbs.insert({ avgPixel, entry });
     }
     return thumbs;
 }
