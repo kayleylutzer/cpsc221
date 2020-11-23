@@ -23,29 +23,34 @@
  */
 
 PNG tiler::tile(PNG & target, const rgbtree & ss, map<RGBAPixel,string> & photos){
-    PNG returnImage = PNG(target.width() * TILESIZE, target.height()*TILESIZE);
-    for(int i = 0; i < target.height(); i++ ) 
-    { 
-        for(int j = 0; j < target.width(); j++) 
-        { 
-            RGBAPixel key = ss.nearestNeighbour(&target.getPixel(i, j));
-            PNG curr; curr.readFromFile(photos.get(key));
-            int startHeight = i*TILESIZE; 
-            int startWidth = j*TILESIZE;
-            for(startHeight < startHeight + TILESIZE; startHeight++) 
-            { 
-                for(startWidth < startWidth + TILESIZE; startWidth++)
-                { 
-                    RGBAPixel* pixelInBiggerImage = returnImage.getPixel(startWidth, startHeight);
-                    RGBAPixel* pixelInSmallerImage = curr.getPixel(startWidth%TILESIZE, startHeight%TILESIZE);
-                    pixelInBiggerImage->r = pixelInSmallerImage->r;
-                    pixelInBiggerImage->g = pixelInSmallerImage->g;
-                    pixelInBiggerImage->b = pixelInSmallerImage->b;
-                    pixelInBiggerImage->a = pixelInSmallerImage->a;
-                }
-            }
+    
+	PNG returnImage = PNG(target.width() * TILESIZE, target.height() * TILESIZE);
+    
+	for(int i = 0; (unsigned) i < target.width(); i++ ) {
+		
+        for(int j = 0; (unsigned) j < target.height(); j++) {
+			
+            RGBAPixel key = ss.findNearestNeighbor(*target.getPixel(i, j));
+            PNG curr; curr.readFromFile(photos[key]); 
+			
+			for(int x = 0; (unsigned) x < curr.width(); x++){
+				
+				for(int y = 0; (unsigned) y < curr.width(); y++){
+			
+				RGBAPixel* pixelInFinal = returnImage.getPixel(i * TILESIZE + x, j * TILESIZE + y);
+				RGBAPixel* pixelInTarget = curr.getPixel(x, y);
+				
+				pixelInFinal->r = pixelInTarget->r;
+				pixelInFinal->g = pixelInTarget->g;
+				pixelInFinal->b = pixelInTarget->b;
+				pixelInFinal->a = pixelInTarget->a;
+
+				}
+			}
+			
         }
     }
+	
     return returnImage;
 }
 
@@ -63,23 +68,34 @@ PNG tiler::tile(PNG & target, const rgbtree & ss, map<RGBAPixel,string> & photos
 */
 map<RGBAPixel, string> tiler::buildMap(string path) {
 
+	int r, g, b, x, y;
+
     map < RGBAPixel, string> thumbs;
     for (const auto & entry : fs::directory_iterator(path)) {
         PNG curr; curr.readFromFile(entry.path());
-        int r,g,b = 0,0,0;
-        int dims = curr.height() * curr.width();
-        for(int y = 0; y < curr.height(); y++)
-        {
-            for(int x = 0; x < curr.width(); x++)
-            { 
-                RGBAPixel* pixel = curr.getPixel(x,y);
-                r += pixel->r;
-                g += pixel->g;
-                b += pixel->b;
-            }
-        }
-        RGBAPixel avgPixel = RGBAPixel(r/dims, g/dims, b/dims);
-        thumbs.insert({ avgPixel, entry });
+		
+		r = 0;
+		g = 0;
+		b = 0; //resets all pixel values to re-use/add into the average RGBAPixel
+		
+		for(x = 0; (unsigned) x < curr.width(); x++){
+			for(y = 0; (unsigned) y < curr.height(); y++){
+					RGBAPixel *p = curr.getPixel(x, y);
+
+					r += p->r;
+					g += p->g;
+					b += p->b;
+				
+			}
+		}
+		
+		r = r / (x*y);
+		g = g / (x*y);
+		b = b / (x*y); //computes the average r, g, and b for the thumbnail
+		
+		RGBAPixel averageOfThumb(r, g, b);
+		thumbs[averageOfThumb] = entry.path();
+
     }
     return thumbs;
 }

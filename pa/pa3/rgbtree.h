@@ -133,7 +133,7 @@ public:
 
   /* =============== end of public PA3 FUNCTIONS =========================*/
 
-    private:
+    public: //changed as per piazza
   /* =============== private PA3 FUNCTIONS =========================*/
   /* most of the files in this section will be helper functions for */
   /* the rgbtree constructor, and for the nearest neighbor function.*/
@@ -186,12 +186,15 @@ public:
      *  splitting plane through point curr, in the given dimension.
      */
     int distToSplit(const RGBAPixel& query, const RGBAPixel& curr, int dimension ) const;
+	
+	//Recursive helper function
+	RGBAPixel findNearestNeighborRec(const RGBAPixel& query, int start, int end, int dimension) const;
+	
+	int distance (RGBAPixel a, RGBAPixel b) const;
+	
+	void buildTree(int start, int end, int dimension); 
+	
 
-    void buildTree(int start, int end, int dimension);
-
-    int distance(RGBAPixel a, RGBAPixel b);
-
-    RGBAPixel recursiveFindNearest(int start, int end, const RGBAPixel & query, int minDist);
 };
 #endif
 
